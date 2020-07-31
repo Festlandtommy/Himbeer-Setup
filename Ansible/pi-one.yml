@@ -2,8 +2,7 @@
   vars:
     admin_keys:
       TAS:
-      - ssh-rsa ABCD1234
-      - ssh-rsa ZXC987AA
+      - {{ lookup("file", "~/.ssh.=/id_rsa.pub" }}
 
     raspberry_pi_boot_config_options:
       # Set the GPU memory split value.
@@ -20,6 +19,7 @@
 
   roles:
     - { role: raspberry-pi }
+    - { role: user, username: TAS }
 
   tasks:
 
@@ -32,9 +32,6 @@
 
     # Set vim as default editor
     - alternatives: name=editor path=/usr/bin/vim.tiny
-
-
-    - name: Copy authorized keys
 
     - name: Clear motd
       copy: dest=/etc/motd content=""
