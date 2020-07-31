@@ -35,3 +35,12 @@
 
     - name: Clear motd
       copy: dest=/etc/motd content=""
+
+    - name: Remove uname on login
+      lineinfile:
+        dest: /etc/update-motd.d/10-uname
+        regexp: '^uname'
+        line: '# uname -snrvm'
+
+    - name: Add welcome screen
+      copy: dest=/home/welcome.sh content={{ lookup("file", "./src/motd/welcome.sh" }}
