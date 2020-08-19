@@ -1,0 +1,13 @@
+---
+- name: APT | Install/update vim
+  apt:
+    name: vim
+    state: latest
+
+- name: COPY | Update vimrc
+  copy:
+    src: vimrc
+    dest: /home/tas/.vimrc
+    owner: TAS
+    group: TAS
+    mode: 0644

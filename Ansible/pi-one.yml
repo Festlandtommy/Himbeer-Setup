@@ -1,4 +1,4 @@
-- hosts: pi-one
+- hosts: {{inventory_hostname}}
   vars:
     admin_keys:
       TAS:
