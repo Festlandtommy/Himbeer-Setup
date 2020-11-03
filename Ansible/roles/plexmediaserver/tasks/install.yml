@@ -30,15 +30,15 @@
 - name: APT | Install plexmediaserver
   apt:
     name: plexmediaserver
-    default_release: stretch
+    # default_release: stretch
     state: latest
   register: plexmediaserver_installed
 
-- name: LINEINFILE | Use 'pi' user instead of 'plex'
-  lineinfile:
-    path: /etc/default/plexmediaserver.prev
-    regexp: '^PLEX_MEDIA_SERVER_USER='
-    line: 'PLEX_MEDIA_SERVER_USER=pi'
+# - name: LINEINFILE | Use 'pi' user instead of 'plex'
+#   lineinfile:
+#     path: /etc/default/plexmediaserver.prev
+#     regexp: "^PLEX_MEDIA_SERVER_USER="
+#     line: "PLEX_MEDIA_SERVER_USER=pi"
 
 - name: SERVICE | Restart plexmediaserver
   service:

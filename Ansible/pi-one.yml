@@ -1,8 +1,8 @@
-- hosts: {{inventory_hostname}}
+- hosts: pi-one
   vars:
     admin_keys:
-      TAS:
-      - {{ lookup("file", "~/.ssh.=/id_rsa.pub" }}
+      tas:
+        - "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
 
     raspberry_pi_boot_config_options:
       # Set the GPU memory split value.
@@ -18,29 +18,29 @@
         line: "/usr/bin/tvservice -o"
 
   roles:
-    - { role: raspberry-pi }
-    - { role: user, username: TAS }
+    - { role: raspberry-pi, become: true }
+    - { role: user, username: tas, become: true }
 
   tasks:
-
     - name: Install basic packages
+      become: true
       apt: package={{ item }} state=present
       with_items:
-      - vim-nox
-      - screen
-      - htop
+        - vim-nox
+        - screen
+        - htop
 
     # Set vim as default editor
     - alternatives: name=editor path=/usr/bin/vim.tiny
+      become: true
 
     - name: Clear motd
+      become: true
       copy: dest=/etc/motd content=""
 
     - name: Remove uname on login
+      become: true
       lineinfile:
         dest: /etc/update-motd.d/10-uname
-        regexp: '^uname'
-        line: '# uname -snrvm'
-
-    - name: Add welcome screen
-      copy: dest=/home/welcome.sh content={{ lookup("file", "./src/motd/welcome.sh" }}
+        regexp: "^uname"
+        line: "# uname -snrvm"

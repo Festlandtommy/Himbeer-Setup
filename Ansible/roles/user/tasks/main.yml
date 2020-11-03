@@ -1,4 +1,4 @@
-- user: name="{{ username }}" groups=sudo append=yes
+- user: name="{{ username }}" groups=sudo,video append=yes
 
 - authorized_key: user="{{ username }}" key="{{ item }}"
   with_items: "{{ admin_keys[username] }}"
@@ -6,5 +6,15 @@
 - authorized_key: user="root" key="{{ item }}"
   with_items: "{{ admin_keys[username] }}"
 
+- name: Copy welcome script to /home
+  become: true
+  copy:
+    dest: /home/welcome.sh
+    content: '{{ lookup("file", "./src/motd/welcome.sh") }}'
+    mode: 0777
 
-
+- name: Set welcome script in /etc/profile
+  lineinfile:
+    path: /etc/profile
+    insertafter: EOF
+    line: "/home/welcome.sh"

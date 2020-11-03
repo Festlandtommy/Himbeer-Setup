@@ -1,5 +1,17 @@
 ---
+- set_fact:
+    real_ansible_host: "{{ ansible_host }}"
+
+- name: "Update APT package cache"
+  become: yes
+  action: apt update_cache=yes
+
+- name: "Upgrade APT to the lastest packages"
+  become: yes
+  action: apt upgrade=safe
+
 - name: Configure options in /boot/config.txt.
+  become: true
   lineinfile:
     dest: /boot/config.txt
     regexp: "{{ item.regexp }}"
@@ -7,8 +19,10 @@
     insertafter: EOF
     state: present
   with_items: "{{ raspberry_pi_boot_config_options }}"
+  register: boot_config
 
 - name: Configure options in /etc/rc.local.
+  become: true
   lineinfile:
     dest: /etc/rc.local
     regexp: "{{ item.regexp }}"
@@ -16,3 +30,40 @@
     insertbefore: "^exit"
     state: present
   with_items: "{{ raspberry_pi_rc_local_options }}"
+  register: rc_local_config
+
+- name: Configure hostname in /etc/hostname.
+  become: true
+  lineinfile:
+    path: /etc/hostname
+    regexp: "^raspberrypi"
+    line: "pi-one"
+    owner: root
+    group: root
+    mode: 0644
+  register: hostname
+
+- name: Configure host in /etc/hosts.
+  become: true
+  ignore_errors: true
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^127.0.1.1"
+    line: "127.0.1.1    pi-one"
+    owner: root
+    group: root
+    mode: 0644
+  register: hosts
+
+- name: "Reboot"
+  shell: sleep 2 && reboot
+  async: 1
+  poll: 0
+  ignore_errors: true
+  when: boot_config.changed or rc_local_config.changed or hostname.changed or hosts.changed
+  register: reboot
+
+- name: "Wait for Raspberry PI to come back"
+  local_action: wait_for host={{ real_ansible_host }} port=22 state=started delay=10
+  become: false
+  when: reboot.changed

@@ -33,10 +33,10 @@ RAM2=`free -h | grep 'Mem' | awk '{print $3}'`    # Used
 RAM3=`free -h | grep 'Mem' | awk '{print $4}'`    # Free
 # RAM4=`free -h | grep 'Swap' | awk '{print $3}'`    # Swap used
 # IP-Adressen ermitteln
-if ( ifconfig | grep -q "eth0" -a1 | grep -w "inet" ) ; then IP_LAN=`ifconfig eth0 | grep -w "inet" | cut -d " " -f 10` ; else IP_LAN="---" ; fi ;
-if ( ifconfig | grep -q "wlan0" -a1 | grep -w "inet" ) ; then IP_WLAN=`ifconfig wlan0 | grep -w "inet" | cut -d "" -f 10 ; else IP_WLAN="---" ; fi ;
+if ( ifconfig | grep "eth0" -a1 | grep -w "inet" ) ; then IP_LAN=`ifconfig eth0 | grep -w "inet" | cut -d " " -f 10` ; else IP_LAN="---" ; fi ;
+if ( ifconfig | grep "wlan0" -a1 | grep -w "inet" ) ; then IP_WLAN=`ifconfig wlan0 | grep -w "inet" | cut -d "" -f 10` ; else IP_WLAN="---" ; fi ;
 echo "\033[1;32m   .~~.   .~~.    \033[1;36m$DATUM
-\033[1;32m  '. \ ' ' / .'   
+\033[1;32m  '. \ ' ' / .'
 \033[1;31m   .~ .~~~..~.    \033[0;37mHostname......: \033[1;33m$HOSTNAME
 \033[1;31m  : .~.'~'.~. :   \033[0;37mLetzter Login.: $LAST1, $LAST2 $LAST3 $LAST4 von $LAST5
 \033[1;31m ~ (   ) (   ) ~  \033[0;37mUptime........: $UP1 Tage, $UP2:$UP3 Stunden
