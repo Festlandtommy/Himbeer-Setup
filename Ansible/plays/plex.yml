@@ -1,0 +1,8 @@
+- hosts: pi-one
+  become: true
+
+  roles:
+    - { role: htop, tags: ["htop"] }
+    # - { role: win2utf8, tags: ["win2utf8"] }
+    - { role: plexmediaserver, tags: ["plexmediaserver"] }
+    # - { role: plexconnect, tags: ["plexconnect"] }

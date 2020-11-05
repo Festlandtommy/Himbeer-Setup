@@ -1,0 +1,78 @@
+---
+- name: Set SELinux to disabled state
+  selinux:
+    state: disabled
+  when: ansible_distribution in ['CentOS', 'Red Hat Enterprise Linux']
+
+- name: Enable IPv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Enable IPv6 forwarding
+  sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Add br_netfilter to /etc/modules-load.d/
+  copy:
+    content: "br_netfilter"
+    dest: /etc/modules-load.d/br_netfilter.conf
+    mode: "u=rw,g=,o="
+  when: ansible_distribution in ['CentOS', 'Red Hat Enterprise Linux']
+
+- name: Load br_netfilter
+  modprobe:
+    name: br_netfilter
+    state: present
+  when: ansible_distribution in ['CentOS', 'Red Hat Enterprise Linux']
+
+- name: Set bridge-nf-call-iptables (just to be sure)
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+    reload: yes
+  when: ansible_distribution in ['CentOS', 'Red Hat Enterprise Linux']
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+
+- name: Add /usr/local/bin to sudo secure_path
+  lineinfile:
+    line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin'
+    regexp: "Defaults(\\s)*secure_path(\\s)*="
+    state: present
+    insertafter: EOF
+    path: /etc/sudoers
+    validate: 'visudo -cf %s'
+  when: ansible_distribution in ['CentOS', 'Red Hat Enterprise Linux']
+
+- name: Activating cgroup support
+  lineinfile:
+    path: /boot/cmdline.txt
+    regexp: '^((?!.*\bcgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory\b).*)$'
+    line: '\1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory'
+    backrefs: true
+  notify: reboot
+
+- name: Flush iptables before changing to iptables-legacy
+  iptables:
+    flush: true
+  changed_when: false   # iptables flush always returns changed
+
+- name: Changing to iptables-legacy
+  alternatives:
+    path: /usr/sbin/iptables-legacy
+    name: iptables
+  register: ip4_legacy
+
+- name: Changing to ip6tables-legacy
+  alternatives:
+    path: /usr/sbin/ip6tables-legacy
+    name: ip6tables
+  register: ip6_legacy
