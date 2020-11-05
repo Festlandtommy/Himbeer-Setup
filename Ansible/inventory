@@ -1,5 +1,5 @@
 [master]
-pi-one ansible_user=pi ansible_host=192.168.0.2
+pi-one ansible_user=pi ansible_host=192.168.0.11
 
 [node]
 pi-two ansible_user=pi ansible_host=192.168.0.12
