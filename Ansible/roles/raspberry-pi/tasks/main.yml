@@ -34,13 +34,14 @@
 
 - name: Configure hostname in /etc/hostname.
   become: true
-  lineinfile:
-    path: /etc/hostname
-    regexp: "^raspberrypi"
-    line: "{{ hostname }}"
-    owner: root
-    group: root
-    mode: "644"
+  command: hostnamectl set-hostname "{{ hostname }}"
+  # lineinfile:
+  #   path: /etc/hostname
+  #   regexp: "^raspberrypi"
+  #   line: "{{ hostname }}"
+  #   owner: root
+  #   group: root
+  #   mode: "644"
   register: hostname
 
 - name: Configure host in /etc/hosts.
