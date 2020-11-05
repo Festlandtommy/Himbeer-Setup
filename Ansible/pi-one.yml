@@ -1,4 +1,4 @@
-- hosts: pi-one
+- hosts: "{{ hostname }}"
   vars:
     admin_keys:
       tas:
@@ -20,6 +20,7 @@
   roles:
     - { role: raspberry-pi, become: true }
     - { role: user, username: tas, become: true }
+    - { role: static-ip }
 
   tasks:
     - name: Install basic packages
@@ -44,3 +45,23 @@
         dest: /etc/update-motd.d/10-uname
         regexp: "^uname"
         line: "# uname -snrvm"
+
+  vars_prompt:
+    - name: "hostname"
+      prompt: "Hostname"
+      private: no
+    - name: "interface"
+      prompt: "Ethernet interface"
+      default: "eth0"
+      private: no
+    - name: "ipaddress"
+      prompt: "Static IPv4 address"
+      private: no
+    - name: "routers"
+      prompt: "Routers (comma separated)"
+      default: "192.168.0.1"
+      private: no
+    - name: "dns_servers"
+      prompt: "DNS servers (space separated)"
+      default: "8.8.8.8 8.8.4.4"
+      private: no

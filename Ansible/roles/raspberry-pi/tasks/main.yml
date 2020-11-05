@@ -37,10 +37,10 @@
   lineinfile:
     path: /etc/hostname
     regexp: "^raspberrypi"
-    line: "pi-one"
+    line: "{{ hostname }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "644"
   register: hostname
 
 - name: Configure host in /etc/hosts.
@@ -49,10 +49,10 @@
   lineinfile:
     path: /etc/hosts
     regexp: "^127.0.1.1"
-    line: "127.0.1.1    pi-one"
+    line: "127.0.1.1    {{ hostname }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "644"
   register: hosts
 
 - name: "Reboot"
