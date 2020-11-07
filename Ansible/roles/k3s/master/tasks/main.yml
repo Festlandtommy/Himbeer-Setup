@@ -1,10 +1,11 @@
 ---
-
 - name: Copy K3s service file
   register: k3s_service
+  vars:
+    extra_server_args: ""
   template:
     src: "k3s.service.j2"
-    dest: "{{ systemd_dir }}/k3s.service"
+    dest: "/etc/systemd/system/k3s.service"
     owner: root
     group: root
     mode: 0755
@@ -62,7 +63,7 @@
 - name: Replace https://localhost:6443 by https://master-ip:6443
   command: >-
     k3s kubectl config set-cluster default
-      --server=https://{{ master_ip }}:6443
+      --server=https://192.168.0.11:6443
       --kubeconfig ~{{ ansible_user }}/.kube/config
   changed_when: true
 
